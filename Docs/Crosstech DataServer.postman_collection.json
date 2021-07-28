@@ -1,0 +1,291 @@
+{
+	"info": {
+		"_postman_id": "544962dc-ee61-4819-90b4-24f61d2f9c6e",
+		"name": "Crosstech DataServer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "AgentController",
+			"item": [
+				{
+					"name": "GetAllAgent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:21985/Agents",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "21985",
+							"path": [
+								"Agents"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAgentById",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "http://localhost:21985/Agents/64ad8366-2a6d-45ce-762f-08d951c17c36",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "21985",
+							"path": [
+								"Agents",
+								"64ad8366-2a6d-45ce-762f-08d951c17c36"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateAgent",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"deneme-string\",\r\n    \"agentCode\": \"deneme-string-123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:21985/Agents",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "21985",
+							"path": [
+								"Agents"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteAgent",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\" : \"ec163a85-194d-444c-ab51-08d951ce42eb\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:21985/Agents",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "21985",
+							"path": [
+								"Agents"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "EntryController",
+			"item": [
+				{
+					"name": "GetAllEntry",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:21985/Entries/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "21985",
+							"path": [
+								"Entries",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetEntryByDataCode",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"dataCode\" : \"navigation-turn-direction\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:21985/Entries/Read",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "21985",
+							"path": [
+								"Entries",
+								"Read"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateEntry",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"agentId\" : \"abf90a88-001c-4317-a17f-ba7970aa579d\",\r\n    \"dataCode\": \"compass-direction\",\r\n    \"value\": \"4\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:21985/Entries/Write",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "21985",
+							"path": [
+								"Entries",
+								"Write"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteEntry",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\" : \"2f08cf39-541c-4b4d-6ce6-08d951cea710\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:21985/Entries",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "21985",
+							"path": [
+								"Entries"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": "17f9f83d-ad9c-445f-569e-08d9510b5cf6"
+		}
+	]
+}

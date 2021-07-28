@@ -1,0 +1,56 @@
+﻿using DataServer.ClientLibrary;
+using System;
+using System.Threading.Tasks;
+using System.Threading;
+
+namespace DataServer.Clients.Navigation
+{
+    public class CompassApp
+    {
+        public async Task Run()
+        {
+            await RegisterAgent();
+            await SendData();
+        }
+
+        public async Task RegisterAgent()
+        {
+            var serverClient = new DataServerClient();
+            var response = await serverClient.Register(Constants.AgentName, Constants.AgentCode);
+            if (response.IsSucceded)
+            {
+                var dataStore = new DataStore();
+                dataStore.SetAgentId(response.Id.Value);
+
+                Console.WriteLine("Agent successfully registered. Agent Id = " + response.Id);
+            }
+            else
+            {
+                Console.WriteLine("Agent registering failed");
+            }
+        }
+
+        public async Task SendData()
+        {
+            await Task.Run(async () =>
+            {
+                var serverClient = new DataServerClient();
+                var dataStore = new DataStore();
+                Guid agentId = dataStore.GetAgentId();
+
+                for (int i = 0; i < 100; i++)
+                {
+                    string value = new Random().Next(0, 360).ToString();
+
+                    var response = await serverClient.WriteData(agentId, Constants.DataCode, value);
+
+                    dataStore.SetValue(value);
+
+                    Console.WriteLine($"New Value: {value}");
+
+                    Thread.Sleep(1000);
+                }
+            });
+        }
+    }
+}
