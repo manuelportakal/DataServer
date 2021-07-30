@@ -1,18 +1,15 @@
-using DataServer.App;
+using DataServer.Api.Extensions;
+using DataServer.App.CacheLayer;
+using DataServer.App.Repositories;
+using DataServer.App.Services;
 using DataServer.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DataServer.Api
 {
@@ -29,6 +26,7 @@ namespace DataServer.Api
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddDependencies();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -38,12 +36,14 @@ namespace DataServer.Api
             {
                 options.UseSqlServer(Configuration.GetConnectionString("Localsqlserver"));
             });
-            services.AddTransient<AgentService>();            
+            services.AddTransient<EntryRepository>();
+            services.AddTransient<EntryCacheService>();
+            services.AddTransient<AgentService>();
             services.AddTransient<EntryService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, EntryService entryService)
         {
             if (env.IsDevelopment())
             {
@@ -60,6 +60,9 @@ namespace DataServer.Api
             {
                 endpoints.MapControllers();
             });
+
+            //reload all data from db to cache
+            entryService.Reload();
         }
     }
 }

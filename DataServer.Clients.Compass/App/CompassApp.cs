@@ -42,11 +42,14 @@ namespace DataServer.Clients.Navigation
                 {
                     string value = new Random().Next(0, 360).ToString();
 
+                    var startTime = DateTime.Now;
                     var response = await serverClient.WriteData(agentId, Constants.DataCode, value);
+                    var stopTime = DateTime.Now;
 
                     dataStore.SetValue(value);
 
-                    Console.WriteLine($"New Value: {value}");
+                    var diff = stopTime - startTime;
+                    Console.WriteLine($"New Value: {value}, IsSucceeded = {response.IsSucceded}, total(ms): {diff.TotalMilliseconds}");
 
                     Thread.Sleep(1000);
                 }

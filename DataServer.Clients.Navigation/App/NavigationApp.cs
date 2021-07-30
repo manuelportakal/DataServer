@@ -38,8 +38,10 @@ namespace DataServer.Clients.Navigation
                 var dataStore = new DataStore();
                 Guid agentId = dataStore.GetAgentId();
 
+
                 for (int i = 0; i < 100; i++)
                 {
+                    var startTime = DateTime.Now;
                     var readResponse = await serverClient.ReadData("compass-direction");
                     if (!readResponse.IsSucceded)
                     {
@@ -47,15 +49,17 @@ namespace DataServer.Clients.Navigation
                         continue;
                     }
 
-
                     string turnDirection = Evaluate(Convert.ToInt32(readResponse.Value));
+                    var stopTime = DateTime.Now;
+
                     var writeResponse = await serverClient.WriteData(agentId, Constants.DataCode, turnDirection);
 
                     dataStore.SetTurnDirection(turnDirection);
 
-                    Console.WriteLine($"Direction: {turnDirection} for {readResponse.Value}");
+                    var diff = stopTime - startTime;
+                    Console.WriteLine($"Direction: {turnDirection} for {readResponse.Value}, total(ms) = {diff.TotalMilliseconds}");
 
-                    Thread.Sleep(5000);
+                    Thread.Sleep(3000);
                 }
             });
         }

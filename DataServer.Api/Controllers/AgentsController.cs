@@ -1,14 +1,7 @@
-﻿using DataServer.App;
-using DataServer.App.Models.AgentModels;
-using DataServer.Domain;
-using DataServer.Infrastructure;
+﻿using DataServer.App.Models.AgentModels;
+using DataServer.App.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DataServer.Api.Controllers
 {
@@ -29,17 +22,20 @@ namespace DataServer.Api.Controllers
             return Ok(_agentService.GetById(id));
         }
 
+
         [HttpGet]
         public IActionResult All()
         {
             return Ok(_agentService.All());
         }
 
+
         [HttpPost]
         public CreateAgentResponseModel Create(CreateAgentRequestModel requestModel)
         {
             return _agentService.Create(requestModel);
         }
+
 
         [HttpDelete]
         public RemoveAgentResponseModel Remove(RemoveAgentRequestModel requestModel)

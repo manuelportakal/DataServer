@@ -1,11 +1,14 @@
 ﻿using DataServer.App.Models.AgentModels;
 using DataServer.Domain;
 using DataServer.Infrastructure;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
-namespace DataServer.App
+namespace DataServer.App.Services
 {
     public class AgentService
     {
@@ -13,12 +16,13 @@ namespace DataServer.App
         public AgentService(ApplicationDbContext applicationDbContext)
         {
             _applicationDbContext = applicationDbContext;
+            Console.WriteLine("Agent Service Created");
         }
 
         public List<Agent> All()
         {
             var agents = _applicationDbContext.Agents
-                                                .ToList();
+                                    .ToList();
 
             return agents;
         }
