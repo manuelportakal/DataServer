@@ -12,7 +12,7 @@ namespace DataServer.ClientLibrary
 {
     public class DataServerClient
     {
-        JsonSerializerOptions serializerSettings = new JsonSerializerOptions()
+        readonly JsonSerializerOptions serializerSettings = new ()
         {
             PropertyNameCaseInsensitive = true
         };

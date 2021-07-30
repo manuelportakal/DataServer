@@ -1,14 +1,6 @@
-﻿using DataServer.App;
-using DataServer.App.Models.EntryModels;
-using DataServer.Domain;
-using DataServer.Infrastructure;
+﻿using DataServer.App.Models.EntryModels;
+using DataServer.App.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DataServer.Api.Controllers
 {
@@ -29,17 +21,20 @@ namespace DataServer.Api.Controllers
             return _entryService.GetByDataCode(requestModel);
         }
 
+
         [HttpGet]
         public IActionResult All()
         {
             return Ok(_entryService.All());
         }
 
+
         [HttpPost("[action]")]
         public CreateEntryResponseModel Write(CreateEntryRequestModel request)
         {
-            return _entryService.Create(request);
+            return _entryService.Write(request);
         }
+
 
         [HttpDelete]
         public RemoveEntryResponseModel Remove(RemoveEntryRequestModel requestModel)
