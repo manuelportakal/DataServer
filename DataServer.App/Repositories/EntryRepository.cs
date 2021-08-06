@@ -30,7 +30,7 @@ namespace DataServer.App.Repositories
         public Entry GetByDataCode(ReadEntryRequestModel requestModel)
         {
             var entry = _applicationDbContext.Entries
-                  .FirstOrDefault(x => x.DataCode == requestModel.DataCode);
+                  .FirstOrDefault(x => x.Code == requestModel.DataCode);
 
             return entry;
         }
@@ -44,7 +44,7 @@ namespace DataServer.App.Repositories
             if (controlAgent == null)
                 return null;
 
-            var oldEntry = controlAgent.Entries.FirstOrDefault(x => x.DataCode == entry.DataCode);
+            var oldEntry = controlAgent.Entries.FirstOrDefault(x => x.Code == entry.Code);
 
             if (oldEntry != null)
             {

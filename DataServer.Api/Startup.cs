@@ -2,6 +2,7 @@ using DataServer.Api.Extensions;
 using DataServer.App.CacheLayer;
 using DataServer.App.Repositories;
 using DataServer.App.Services;
+using DataServer.Domain;
 using DataServer.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -36,8 +37,8 @@ namespace DataServer.Api
             {
                 options.UseSqlServer(Configuration.GetConnectionString("Localsqlserver"));
             });
+            services.AddTransient<AgentRepository>();
             services.AddTransient<EntryRepository>();
-            services.AddTransient<EntryCacheService>();
             services.AddTransient<AgentService>();
             services.AddTransient<EntryService>();
         }

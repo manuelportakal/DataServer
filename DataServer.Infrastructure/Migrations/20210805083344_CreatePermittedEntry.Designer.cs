@@ -4,14 +4,16 @@ using DataServer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataServer.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210805083344_CreatePermittedEntry")]
+    partial class CreatePermittedEntry
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,7 +27,7 @@ namespace DataServer.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Code")
+                    b.Property<string>("AgentCode")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -45,7 +47,7 @@ namespace DataServer.Infrastructure.Migrations
                     b.Property<Guid>("AgentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Code")
+                    b.Property<string>("DataCode")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("TimeStamp")
@@ -94,7 +96,7 @@ namespace DataServer.Infrastructure.Migrations
             modelBuilder.Entity("DataServer.Domain.PermittedEntry", b =>
                 {
                     b.HasOne("DataServer.Domain.Agent", "Agent")
-                        .WithMany("PermittedEntries")
+                        .WithMany()
                         .HasForeignKey("AgentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -105,8 +107,6 @@ namespace DataServer.Infrastructure.Migrations
             modelBuilder.Entity("DataServer.Domain.Agent", b =>
                 {
                     b.Navigation("Entries");
-
-                    b.Navigation("PermittedEntries");
                 });
 #pragma warning restore 612, 618
         }

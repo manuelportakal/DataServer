@@ -3,10 +3,12 @@ using System.Collections.Generic;
 
 namespace DataServer.App.Models.AgentModels
 {
-    public class CreateAgentRequestModel
+    public class ReadAgentResponseModel
     {
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public string AgentCode { get; set; }
-        public List<string> EntryCodes { get; set; }
+
+        public bool IsSucceded { get; set; }
     }
 }

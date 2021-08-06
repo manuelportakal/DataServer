@@ -1,6 +1,9 @@
-﻿using DataServer.App.Models.AgentModels;
+﻿using DataServer.App.CacheLayer;
+using DataServer.App.Models.AgentModels;
+using DataServer.App.Repositories;
 using DataServer.Domain;
 using DataServer.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 using System;
@@ -12,72 +15,92 @@ namespace DataServer.App.Services
 {
     public class AgentService
     {
+        private readonly CustomCacheService<Agent> _cacheService;
+        private readonly AgentRepository _agentRepository;
         private readonly ApplicationDbContext _applicationDbContext;
-        public AgentService(ApplicationDbContext applicationDbContext)
+        public AgentService(ApplicationDbContext applicationDbContext, IMemoryCache memoryCache, AgentRepository agentRepository)
         {
             _applicationDbContext = applicationDbContext;
-            Console.WriteLine("Agent Service Created");
+            _cacheService = new CustomCacheService<Agent>(memoryCache);
+            _agentRepository = agentRepository;
         }
 
         public List<Agent> All()
         {
-            var agents = _applicationDbContext.Agents
-                                    .ToList();
-
-            return agents;
+            return _agentRepository.All();
         }
 
-        public Agent GetById(Guid id)
+        public ReadAgentResponseModel GetById(Guid id)
         {
-            var agent = _applicationDbContext.Agents
-                                                .FirstOrDefault(x => x.Id == id);
+            var agent = _agentRepository.GetById(id);
+            if (agent != null)
+            {
+                return new ReadAgentResponseModel()
+                {
+                    Id = agent.Id,
+                    AgentCode = agent.Code,
+                    Name = agent.Name,
+                    IsSucceded = true
+                };
+            }
 
-            return agent;
+            return new ReadAgentResponseModel()
+            {
+                IsSucceded = false
+            };
+        }
+
+        public ReadAgentResponseModel GetByCode(string code)
+        {
+            var agent = _cacheService.Read(code);
+
+            if (agent == null)
+            {
+                agent = _agentRepository.GetByCode(code);
+                _cacheService.Write(agent);
+
+                return new ReadAgentResponseModel()
+                {
+                    IsSucceded = false
+                };
+            }
+
+            return new ReadAgentResponseModel()
+            {
+                Id = agent.Id,
+                AgentCode = agent.Code,
+                Name = agent.Name,
+                IsSucceded = true
+            };
         }
 
         public CreateAgentResponseModel Create(CreateAgentRequestModel requestModel)
         {
-            var controlAgent = _applicationDbContext.Agents.
-                                                FirstOrDefault(x => x.AgentCode == requestModel.AgentCode);
+            var agent = _agentRepository.Create(requestModel);
 
-            if (controlAgent != null)
+            if (agent != null)
             {
-                return new CreateAgentResponseModel()
-                {
-                    Id = controlAgent.Id,
-                    IsSucceded = true
-                };
-            }
-            else
-            {
-                var agent = new Agent()
-                {
-                    Name = requestModel.Name,
-                    AgentCode = requestModel.AgentCode
-                };
-
-                _applicationDbContext.Agents.Add(agent);
-                _applicationDbContext.SaveChanges();
+                _cacheService.Write(agent);
 
                 return new CreateAgentResponseModel()
                 {
                     Id = agent.Id,
                     IsSucceded = true
                 };
-
             }
+
+            return new CreateAgentResponseModel()
+            {
+                IsSucceded = false
+            };
         }
 
         public RemoveAgentResponseModel Remove(RemoveAgentRequestModel requestModel)
         {
-            var agent = _applicationDbContext.Agents
-                                    .FirstOrDefault(x => x.Id == requestModel.Id);
+            var agent = _agentRepository.Remove(requestModel);
 
             if (agent != null)
             {
-                _applicationDbContext.Agents.Remove(agent);
-                _applicationDbContext.SaveChanges();
-
                 return new RemoveAgentResponseModel()
                 {
                     Id = agent.Id,
@@ -89,6 +112,11 @@ namespace DataServer.App.Services
             {
                 IsSucceded = false
             };
+        }
+
+        public bool IsPermitted(string agentCode, string entryCode)
+        {
+            return _agentRepository.IsPermitted(agentCode, entryCode);
         }
     }
 }

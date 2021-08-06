@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace DataServer.ClientLibrary.Models
 {
@@ -6,5 +7,6 @@ namespace DataServer.ClientLibrary.Models
     {
         public string Name { get; set; }
         public string AgentCode { get; set; }
+        public List<string> EntryCodes { get; set; }
     }
 }

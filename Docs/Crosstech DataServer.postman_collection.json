@@ -64,7 +64,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"deneme-string\",\r\n    \"agentCode\": \"deneme-string-123\"\r\n}",
+							"raw": "{\r\n    \"name\": \"deneme-string\",\r\n    \"agentCode\": \"deneme-string-123\",\r\n    \"entryCodes\": [\r\n        \"compass-direction\",\r\n        \"compass-pressure\"\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -171,7 +171,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"dataCode\" : \"navigation-turn-direction\"\r\n}",
+							"raw": "{\r\n    \"dataCode\" : \"compass-direction\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -203,7 +203,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"agentId\" : \"abf90a88-001c-4317-a17f-ba7970aa579d\",\r\n    \"dataCode\": \"compass-direction\",\r\n    \"value\": \"4\"\r\n}",
+							"raw": "{\r\n    \"agentId\" : \"9aa9f351-1b79-493f-a043-08d957f10211\",\r\n    \"agentCode\" : \"deneme-string-123\",\r\n    \"dataCode\": \"compass-direction\",\r\n    \"value\": \"5\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -235,7 +235,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"id\" : \"2f08cf39-541c-4b4d-6ce6-08d951cea710\"\r\n}",
+							"raw": "{\r\n    \"id\" : \"1795a4a2-30ed-43cd-fdb1-08d957f862bc\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

@@ -16,7 +16,7 @@ namespace DataServer.Clients.Navigation
         public async Task RegisterAgent()
         {
             var serverClient = new DataServerClient();
-            var response = await serverClient.Register(Constants.AgentName, Constants.AgentCode);
+            var response = await serverClient.Register(Constants.AgentName, Constants.AgentCode, Constants.EntryCodes);
             if (response.IsSucceded)
             {
                 var dataStore = new DataStore();
@@ -43,7 +43,7 @@ namespace DataServer.Clients.Navigation
                     string value = new Random().Next(0, 360).ToString();
 
                     var startTime = DateTime.Now;
-                    var response = await serverClient.WriteData(agentId, Constants.DataCode, value);
+                    var response = await serverClient.WriteData(agentId, Constants.AgentCode, Constants.DataCode, value);
                     var stopTime = DateTime.Now;
 
                     dataStore.SetValue(value);

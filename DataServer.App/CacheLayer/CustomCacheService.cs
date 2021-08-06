@@ -1,4 +1,5 @@
 ﻿using DataServer.Domain;
+using DataServer.Domain.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
@@ -8,25 +9,24 @@ using System.Threading.Tasks;
 
 namespace DataServer.App.CacheLayer
 {
-    public class EntryCacheService
+    public class CustomCacheService<T> where T : IDataCode
     {
         private readonly IMemoryCache _cache;
-        public EntryCacheService(IMemoryCache cache)
+        public CustomCacheService(IMemoryCache cache)
         {
             _cache = cache;
         }
 
-        public Entry Read(string dataCode)
+        public T Read(string dataCode)
         {
-            var cacheKey = $"entries-{dataCode}";
+            var cacheKey = $"{dataCode}";
 
-            if (_cache.TryGetValue(cacheKey, out Entry entry))
-                return entry;
-            else
-                return null;
+            _cache.TryGetValue(cacheKey, out T entry);
+            return entry;
+
         }
 
-        public bool Write(Entry entry)
+        public bool Write(T entry)
         {
             // Set cache options.
             var cacheEntryOptions = new MemoryCacheEntryOptions()
@@ -37,7 +37,7 @@ namespace DataServer.App.CacheLayer
             };
 
             // Save data in cache.
-            var cacheKey = $"entries-{entry.DataCode}";
+            var cacheKey = $"{entry.Code}";
             _cache.Set(cacheKey, entry, cacheEntryOptions);
 
             return true;
