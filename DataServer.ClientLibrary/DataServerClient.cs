@@ -7,22 +7,24 @@ using System.Text.Json;
 using System.Text;
 using System.Threading.Tasks;
 using DataServer.ClientLibrary.RequestResponseModels;
+using System.Collections.Generic;
 
 namespace DataServer.ClientLibrary
 {
     public class DataServerClient
     {
-        readonly JsonSerializerOptions serializerSettings = new ()
+        readonly JsonSerializerOptions serializerSettings = new()
         {
             PropertyNameCaseInsensitive = true
         };
 
-        public async Task<RegisterResult> Register(string name, string agentCode)
+        public async Task<RegisterResult> Register(string name, string agentCode, List<string> entryCodes)
         {
             var request = new RegisterRequestModel()
             {
                 Name = name,
-                AgentCode = agentCode
+                AgentCode = agentCode,
+                EntryCodes = entryCodes
             };
 
             var jsonString = JsonSerializer.Serialize(request);
@@ -49,11 +51,12 @@ namespace DataServer.ClientLibrary
             };
         }
 
-        public async Task<WriteDataResult> WriteData(Guid agentId, string dataCode, string value)
+        public async Task<WriteDataResult> WriteData(Guid agentId, string agentCode, string dataCode, string value)
         {
             var request = new WriteDataRequestModel()
             {
                 AgentId = agentId,
+                AgentCode = agentCode,
                 DataCode = dataCode,
                 Value = value
             };

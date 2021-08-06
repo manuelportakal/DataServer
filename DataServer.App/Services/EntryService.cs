@@ -2,6 +2,7 @@
 using DataServer.App.Models.EntryModels;
 using DataServer.App.Repositories;
 using DataServer.Domain;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 
@@ -9,13 +10,14 @@ namespace DataServer.App.Services
 {
     public class EntryService
     {
-        private readonly EntryCacheService _entryCacheService;
+        private readonly AgentRepository _agentRepository;
+        private readonly CustomCacheService<Entry> _cacheService;
         private readonly EntryRepository _entryRepository;
-        public EntryService(EntryRepository entryRepository, EntryCacheService entryCacheService)
+        public EntryService(EntryRepository entryRepository, IMemoryCache memoryCache, AgentRepository agentRepository)
         {
             _entryRepository = entryRepository;
-            _entryCacheService = entryCacheService;
-            Console.WriteLine("Entry Service Created");
+            _cacheService = new CustomCacheService<Entry>(memoryCache);
+            _agentRepository = agentRepository;
         }
 
         public void Reload()
@@ -23,7 +25,7 @@ namespace DataServer.App.Services
             var entries = _entryRepository.All();
             foreach (var entry in entries)
             {
-                _entryCacheService.Write(entry);
+                _cacheService.Write(entry);
             }
         }
 
@@ -34,12 +36,12 @@ namespace DataServer.App.Services
 
         public ReadEntryResponseModel GetByDataCode(ReadEntryRequestModel requestModel)
         {
-            var entry = _entryCacheService.Read(requestModel.DataCode);
+            var entry = _cacheService.Read(requestModel.DataCode);
 
             if (entry == null)
             {
                 entry = _entryRepository.GetByDataCode(requestModel);
-                _entryCacheService.Write(entry);
+                _cacheService.Write(entry);
                 Console.WriteLine($"{requestModel.DataCode}: miss");
 
                 return new ReadEntryResponseModel()
@@ -53,7 +55,7 @@ namespace DataServer.App.Services
             return new ReadEntryResponseModel()
             {
                 Id = entry.Id,
-                DataCode = entry.DataCode,
+                DataCode = entry.Code,
                 Value = entry.Value,
                 TimeStamp = entry.TimeStamp,
                 IsSucceded = true
@@ -62,15 +64,25 @@ namespace DataServer.App.Services
 
         public CreateEntryResponseModel Write(CreateEntryRequestModel requestModel)
         {
+            // Agent-Entry control
+
+            if (!_agentRepository.IsPermitted(requestModel.AgentCode, requestModel.DataCode))
+            {
+                return new CreateEntryResponseModel()
+                {
+                    IsSucceded = false
+                };
+            }
+
             var entry = new Entry()
             {
                 AgentId = requestModel.AgentId,
                 Value = requestModel.Value,
-                DataCode = requestModel.DataCode,
+                Code = requestModel.DataCode,
                 TimeStamp = DateTime.Now
             };
 
-            _entryCacheService.Write(entry);
+            _cacheService.Write(entry);
 
             entry = _entryRepository.Create(entry);
             if (entry != null)
@@ -80,7 +92,7 @@ namespace DataServer.App.Services
                     Id = entry.Id,
                     AgentId = requestModel.AgentId,
                     Value = entry.Value,
-                    DataCode = entry.DataCode,
+                    DataCode = entry.Code,
                     TimeStamp = entry.TimeStamp,
                     IsSucceded = true
                 };
