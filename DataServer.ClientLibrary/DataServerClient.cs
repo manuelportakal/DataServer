@@ -6,25 +6,38 @@ using DataServer.ClientLibrary.Models;
 using System.Text.Json;
 using System.Text;
 using System.Threading.Tasks;
-using DataServer.ClientLibrary.RequestResponseModels;
 using System.Collections.Generic;
+using DataServer.Common.Models.AgentModels;
+using DataServer.Common.Models.EntryModels;
+using DataServer.Common.Services;
 
 namespace DataServer.ClientLibrary
 {
     public class DataServerClient
     {
-        readonly JsonSerializerOptions serializerSettings = new()
+        private readonly SecurityService _securityService;
+        private readonly JsonSerializerOptions serializerSettings;
+
+        public DataServerClient()
         {
-            PropertyNameCaseInsensitive = true
-        };
+            serializerSettings = new()
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            _securityService = new SecurityService();
+        }
+
 
         public async Task<RegisterResult> Register(string name, string agentCode, List<string> entryCodes)
         {
-            var request = new RegisterRequestModel()
+            var agentRandomNumber = new Random(Environment.TickCount).Next(1000, 9999);
+            var request = new RegisterAgentRequestModel()
             {
                 Name = name,
                 AgentCode = agentCode,
-                EntryCodes = entryCodes
+                EntryCodes = entryCodes,
+                RandomNumber = agentRandomNumber
             };
 
             var jsonString = JsonSerializer.Serialize(request);
@@ -33,33 +46,42 @@ namespace DataServer.ClientLibrary
             var requestUrl = $"{Constants.ApiUrl}/Agents";
             var result = await client.PostAsync(requestUrl, stringContent);
             var responseAsJsonString = await result.Content.ReadAsStringAsync();
-            var responseModel = JsonSerializer.Deserialize<RegisterResponseModel>(responseAsJsonString, serializerSettings);
+            var responseModel = JsonSerializer.Deserialize<RegisterAgentResponseModel>(responseAsJsonString, serializerSettings);
 
             if (result.StatusCode != HttpStatusCode.OK)
             {
                 return new RegisterResult()
                 {
                     Id = null,
-                    IsSucceded = false
+                    IsSucceded = false,
                 };
             }
 
+            var agentSecurityToken = _securityService.CreateAgentKey(responseModel.Id, responseModel.ServerNumber, agentRandomNumber);
+            Console.WriteLine($"created agent security token = {agentSecurityToken}");
             return new RegisterResult()
             {
+
                 Id = responseModel.Id,
-                IsSucceded = true
+                IsSucceded = true,
+                AgentSecurityToken = agentSecurityToken
             };
         }
 
-        public async Task<WriteDataResult> WriteData(Guid agentId, string agentCode, string dataCode, string value)
+        public async Task<WriteDataResult> WriteData(Guid agentId, string agentCode, string dataCode, string value, string agentSecurityToken)
         {
-            var request = new WriteDataRequestModel()
+            var request = new WriteEntryRequestModel()
             {
-                AgentId = agentId,
-                AgentCode = agentCode,
-                DataCode = dataCode,
-                Value = value
+                RequestData = new WriteEntryRequestModel.Data()
+                {
+                    AgentId = agentId,
+                    AgentCode = agentCode,
+                    DataCode = dataCode,
+                    Value = value
+                },
             };
+
+            request.RequestSignature = _securityService.CalculateSignature(request.RequestData, agentSecurityToken);
 
             var jsonString = JsonSerializer.Serialize(request);
             var stringContent = new StringContent(jsonString, UnicodeEncoding.UTF8, "application/json");
@@ -67,9 +89,9 @@ namespace DataServer.ClientLibrary
             var requestUrl = $"{Constants.ApiUrl}/Entries/Write";
             var result = await client.PostAsync(requestUrl, stringContent);
             var responseAsJsonString = await result.Content.ReadAsStringAsync();
-            var responseModel = JsonSerializer.Deserialize<WriteDataResponseModel>(responseAsJsonString, serializerSettings);
+            var responseModel = JsonSerializer.Deserialize<WriteEntryResponseModel>(responseAsJsonString, serializerSettings);
 
-            if (result.StatusCode != HttpStatusCode.OK)
+            if (result.StatusCode != HttpStatusCode.OK || !responseModel.IsSucceded)
             {
                 return new WriteDataResult()
                 {
@@ -85,7 +107,7 @@ namespace DataServer.ClientLibrary
 
         public async Task<ReadDataResult> ReadData(string dataCode)
         {
-            var request = new ReadDataRequestModel()
+            var request = new ReadEntryRequestModel()
             {
                 DataCode = dataCode,
             };
@@ -96,7 +118,7 @@ namespace DataServer.ClientLibrary
             var requestUrl = $"{Constants.ApiUrl}/Entries/Read";
             var result = await client.PostAsync(requestUrl, stringContent);
             var responseAsJsonString = await result.Content.ReadAsStringAsync();
-            var responseModel = JsonSerializer.Deserialize<ReadDataResponseModel>(responseAsJsonString, serializerSettings);
+            var responseModel = JsonSerializer.Deserialize<ReadEntryResponseModel>(responseAsJsonString, serializerSettings);
 
             if (result.StatusCode != HttpStatusCode.OK)
             {

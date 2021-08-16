@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace DataServer.App.Models.AgentModels
+namespace DataServer.Common.Models.EntryModels
 {
-    public class CreateAgentResponseModel
+    public class RemoveEntryResponseModel
     {
         public Guid Id { get; set; }
 

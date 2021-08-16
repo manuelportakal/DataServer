@@ -1,8 +1,4 @@
-﻿using DataServer.App.CacheLayer;
-using DataServer.App.Models.AgentModels;
-using DataServer.App.Models.EntryModels;
-using DataServer.App.Services;
-using DataServer.Domain;
+﻿using DataServer.Domain;
 using DataServer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataServer.App.Repositories
+namespace DataServer.Infrastructure.Repositories
 {
     public class AgentRepository
     {
@@ -46,15 +42,15 @@ namespace DataServer.App.Repositories
             return agent;
         }
 
-        public Agent Create(CreateAgentRequestModel requestModel)
+        public Agent Create(string name, string agentCode, List<string> entryCodes)
         {
             var controlAgent = _applicationDbContext.Agents
                                                 .Include(a => a.PermittedEntries)
-                                                .FirstOrDefault(x => x.Code == requestModel.AgentCode);
+                                                .FirstOrDefault(x => x.Code == agentCode);
 
             if (controlAgent != null)
             {
-                foreach (string item in requestModel.EntryCodes)
+                foreach (string item in entryCodes)
                 {
                     //new entries
                     if (!controlAgent.PermittedEntries.Any(x => x.DataCode == item))
@@ -71,7 +67,7 @@ namespace DataServer.App.Repositories
                 foreach (PermittedEntry item in controlAgent.PermittedEntries)
                 {
                     //old entries
-                    if (!requestModel.EntryCodes.Contains(item.DataCode))
+                    if (!entryCodes.Contains(item.DataCode))
                     {
                         _applicationDbContext.PermittedEntries.Remove(item);
                     }
@@ -85,12 +81,12 @@ namespace DataServer.App.Repositories
             {
                 var agent = new Agent()
                 {
-                    Name = requestModel.Name,
-                    Code = requestModel.AgentCode,
+                    Name = name,
+                    Code = agentCode,
                     PermittedEntries = new List<PermittedEntry>()
                 };
 
-                foreach (var item in requestModel.EntryCodes)
+                foreach (var item in entryCodes)
                 {
                     var permittedEntry = new PermittedEntry()
                     {
@@ -106,10 +102,19 @@ namespace DataServer.App.Repositories
             }
         }
 
-        public Agent Remove(RemoveAgentRequestModel requestModel)
+        public Agent UpdateSecurityToken(Agent agent, string securityToken)
+        {
+            agent.SecurityToken = securityToken;
+            _applicationDbContext.Agents.Update(agent);
+            _applicationDbContext.SaveChanges();
+
+            return agent;
+        }
+
+        public Agent Remove(Guid id)
         {
             var agent = _applicationDbContext.Agents
-                                    .FirstOrDefault(x => x.Id == requestModel.Id);
+                                    .FirstOrDefault(x => x.Id == id);
 
             if (agent != null)
             {

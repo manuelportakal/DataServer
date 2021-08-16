@@ -1,5 +1,4 @@
-﻿using DataServer.App.Models.EntryModels;
-using DataServer.App.Services;
+﻿
 using DataServer.Domain;
 using DataServer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataServer.App.Repositories
+namespace DataServer.Infrastructure.Repositories
 {
     public class EntryRepository
     {
@@ -27,10 +26,10 @@ namespace DataServer.App.Repositories
             return entries;
         }
 
-        public Entry GetByDataCode(ReadEntryRequestModel requestModel)
+        public Entry GetByDataCode(string dataCode)
         {
             var entry = _applicationDbContext.Entries
-                  .FirstOrDefault(x => x.Code == requestModel.DataCode);
+                  .FirstOrDefault(x => x.Code == dataCode);
 
             return entry;
         }
@@ -62,10 +61,10 @@ namespace DataServer.App.Repositories
             return entry;
         }
 
-        public Entry Remove(RemoveEntryRequestModel requestModel)
+        public Entry Remove(Guid id)
         {
             var entry = _applicationDbContext.Entries
-                                    .FirstOrDefault(x => x.Id == requestModel.Id);
+                                    .FirstOrDefault(x => x.Id == id);
 
             if (entry != null)
             {

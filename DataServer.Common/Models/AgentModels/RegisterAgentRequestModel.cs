@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DataServer.App.Models.AgentModels
+namespace DataServer.Common.Models.AgentModels
 {
-    public class CreateAgentRequestModel
+    public class RegisterAgentRequestModel
     {
         public string Name { get; set; }
+        public int RandomNumber { get; set; }
         public string AgentCode { get; set; }
         public List<string> EntryCodes { get; set; }
     }

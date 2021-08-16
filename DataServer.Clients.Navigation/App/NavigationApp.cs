@@ -21,8 +21,9 @@ namespace DataServer.Clients.Navigation
             {
                 var dataStore = new DataStore();
                 dataStore.SetAgentId(response.Id.Value);
+                dataStore.SetSecurityToken(response.AgentSecurityToken);
 
-                Console.WriteLine("Agent successfully registered. Agent Id = " + response.Id);
+                Console.WriteLine($"Agent successfully registered. AgentId={response.Id} SecurityToken={response.AgentSecurityToken}");
             }
             else
             {
@@ -36,8 +37,8 @@ namespace DataServer.Clients.Navigation
             {
                 var serverClient = new DataServerClient();
                 var dataStore = new DataStore();
-                Guid agentId = dataStore.GetAgentId();
-
+                var agentId = dataStore.GetAgentId();
+                var agentSecurityToken = dataStore.GetSecurityToken();
 
                 for (int i = 0; i < 100; i++)
                 {
@@ -52,12 +53,16 @@ namespace DataServer.Clients.Navigation
                     string turnDirection = Evaluate(Convert.ToInt32(readResponse.Value));
                     var stopTime = DateTime.Now;
 
-                    var writeResponse = await serverClient.WriteData(agentId, Constants.AgentCode, Constants.DataCode, turnDirection);
+                    var writeResponse = await serverClient.WriteData(agentId, Constants.AgentCode, Constants.DataCode, turnDirection, agentSecurityToken);
 
                     dataStore.SetTurnDirection(turnDirection);
 
                     var diff = stopTime - startTime;
-                    Console.WriteLine($"Direction: {turnDirection} for {readResponse.Value}, total(ms) = {diff.TotalMilliseconds}");
+
+                    if (writeResponse.IsSucceded)
+                        Console.WriteLine($"Direction:{turnDirection} for {readResponse.Value}, total(ms)={diff.TotalMilliseconds}");
+                    else
+                        Console.WriteLine("Error: Could not write data to server");
 
                     Thread.Sleep(3000);
                 }

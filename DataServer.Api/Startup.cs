@@ -1,9 +1,7 @@
 using DataServer.Api.Extensions;
-using DataServer.App.CacheLayer;
-using DataServer.App.Repositories;
-using DataServer.App.Services;
-using DataServer.Domain;
+using DataServer.Common.Services;
 using DataServer.Infrastructure;
+using DataServer.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -41,6 +39,7 @@ namespace DataServer.Api
             services.AddTransient<EntryRepository>();
             services.AddTransient<AgentService>();
             services.AddTransient<EntryService>();
+            services.AddTransient<SecurityService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

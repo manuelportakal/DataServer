@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DataServer.App.Models.AgentModels
+namespace DataServer.Common.Models.AgentModels
 {
     public class ReadAgentResponseModel
     {

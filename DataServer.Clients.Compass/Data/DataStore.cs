@@ -7,6 +7,7 @@ namespace DataServer.Clients.Navigation
         private static Guid AgentId { get; set; }
         private static string DataCode { get; set; }
         private static string Value { get; set; }
+        private static string SecurityToken { get; set; }
 
         public Guid GetAgentId()
         {
@@ -36,6 +37,16 @@ namespace DataServer.Clients.Navigation
         public void SetValue(string value)
         {
             Value = value;
+        }
+
+        public string GetSecurityToken()
+        {
+            return SecurityToken;
+        }
+
+        public void SetSecurityToken(string value)
+        {
+            SecurityToken = value;
         }
     }
 }

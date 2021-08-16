@@ -1,5 +1,5 @@
-﻿using DataServer.App.Models.EntryModels;
-using DataServer.App.Services;
+﻿using DataServer.Common.Models.EntryModels;
+using DataServer.Common.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DataServer.Api.Controllers
@@ -30,7 +30,7 @@ namespace DataServer.Api.Controllers
 
 
         [HttpPost("[action]")]
-        public CreateEntryResponseModel Write(CreateEntryRequestModel request)
+        public WriteEntryResponseModel Write(WriteEntryRequestModel request)
         {
             return _entryService.Write(request);
         }

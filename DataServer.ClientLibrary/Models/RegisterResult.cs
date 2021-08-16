@@ -7,5 +7,6 @@ namespace DataServer.ClientLibrary.Models
         public Guid? Id { get; set; }
 
         public bool IsSucceded { get; set; }
+        public string AgentSecurityToken { get; set; }
     }
 }

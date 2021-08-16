@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataServer.ClientLibrary", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataServer.Clients.Navigation", "DataServer.Clients.Navigation\DataServer.Clients.Navigation.csproj", "{59B7C168-E24F-4E35-AEAD-9927E964198F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataServer.Common", "DataServer.Common\DataServer.Common.csproj", "{AA602EBD-6428-40E3-9457-AF2605E3FADD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{59B7C168-E24F-4E35-AEAD-9927E964198F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59B7C168-E24F-4E35-AEAD-9927E964198F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59B7C168-E24F-4E35-AEAD-9927E964198F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA602EBD-6428-40E3-9457-AF2605E3FADD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA602EBD-6428-40E3-9457-AF2605E3FADD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA602EBD-6428-40E3-9457-AF2605E3FADD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA602EBD-6428-40E3-9457-AF2605E3FADD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
