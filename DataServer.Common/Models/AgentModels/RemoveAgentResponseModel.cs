@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DataServer.App.Models.AgentModels
+namespace DataServer.Common.Models.AgentModels
 {
     public class RemoveAgentResponseModel
     {

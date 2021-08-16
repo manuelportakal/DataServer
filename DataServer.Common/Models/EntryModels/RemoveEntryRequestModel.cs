@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DataServer.App.Models.EntryModels
+namespace DataServer.Common.Models.EntryModels
 {
     public class RemoveEntryRequestModel
     {

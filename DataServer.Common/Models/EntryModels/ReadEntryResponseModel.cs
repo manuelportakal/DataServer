@@ -1,14 +1,13 @@
 ﻿using System;
 
-namespace DataServer.App.Models.EntryModels
+namespace DataServer.Common.Models.EntryModels
 {
-    public class CreateEntryResponseModel
+    public class ReadEntryResponseModel
     {
         public Guid Id { get; set; }
         public DateTime TimeStamp { get; set; }
         public string Value { get; set; }
         public string DataCode { get; set; }
-        public Guid AgentId { get; set; }
 
         public bool IsSucceded { get; set; }
     }

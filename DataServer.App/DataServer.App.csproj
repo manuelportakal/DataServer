@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DataServer.Common\DataServer.Common.csproj" />
     <ProjectReference Include="..\DataServer.Infrastructure\DataServer.Infrastructure.csproj" />
   </ItemGroup>
 

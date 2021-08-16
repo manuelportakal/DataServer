@@ -7,6 +7,7 @@ namespace DataServer.Clients.Navigation
         private static Guid AgentId { get; set; }
         private static string CompassValue { get; set; }
         private static string TurnDirection { get; set; }
+        private static string SecurityToken { get; set; }
 
         public Guid GetAgentId()
         {
@@ -36,6 +37,16 @@ namespace DataServer.Clients.Navigation
         public void SetTurnDirection(string turnDirection)
         {
             TurnDirection = turnDirection;
+        }
+
+        public string GetSecurityToken()
+        {
+            return SecurityToken;
+        }
+
+        public void SetSecurityToken(string value)
+        {
+            SecurityToken = value;
         }
     }
 }

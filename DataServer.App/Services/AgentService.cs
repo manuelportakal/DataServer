@@ -1,8 +1,10 @@
-﻿using DataServer.App.CacheLayer;
-using DataServer.App.Models.AgentModels;
-using DataServer.App.Repositories;
+﻿
+using DataServer.App.Data;
+using DataServer.Common.Models.AgentModels;
 using DataServer.Domain;
 using DataServer.Infrastructure;
+using DataServer.Infrastructure.Caching;
+using DataServer.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
@@ -11,18 +13,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace DataServer.App.Services
+namespace DataServer.Common.Services
 {
     public class AgentService
     {
-        private readonly CustomCacheService<Agent> _cacheService;
+        private readonly SecurityService _securityService;
+        private readonly CustomCacheWrapper<Agent> _agentCacheService;
         private readonly AgentRepository _agentRepository;
         private readonly ApplicationDbContext _applicationDbContext;
-        public AgentService(ApplicationDbContext applicationDbContext, IMemoryCache memoryCache, AgentRepository agentRepository)
+        public AgentService(ApplicationDbContext applicationDbContext, IMemoryCache memoryCache, AgentRepository agentRepository, SecurityService securityService)
         {
             _applicationDbContext = applicationDbContext;
-            _cacheService = new CustomCacheService<Agent>(memoryCache);
+            CacheData.Load(memoryCache);
+            _agentCacheService = CacheData._agentCacheService;
             _agentRepository = agentRepository;
+            _securityService = securityService;
         }
 
         public List<Agent> All()
@@ -52,12 +57,12 @@ namespace DataServer.App.Services
 
         public ReadAgentResponseModel GetByCode(string code)
         {
-            var agent = _cacheService.Read(code);
+            var agent = _agentCacheService.Read(code);
 
             if (agent == null)
             {
                 agent = _agentRepository.GetByCode(code);
-                _cacheService.Write(agent);
+                _agentCacheService.Write(agent);
 
                 return new ReadAgentResponseModel()
                 {
@@ -74,22 +79,28 @@ namespace DataServer.App.Services
             };
         }
 
-        public CreateAgentResponseModel Create(CreateAgentRequestModel requestModel)
+        public RegisterAgentResponseModel Create(RegisterAgentRequestModel requestModel)
         {
-            var agent = _agentRepository.Create(requestModel);
+            var agent = _agentRepository.Create(requestModel.Name, requestModel.AgentCode, requestModel.EntryCodes);
 
             if (agent != null)
             {
-                _cacheService.Write(agent);
+                int serverRandomNumber = new Random(Environment.TickCount).Next(1000, 9999);
+                var securityToken = _securityService.CreateAgentKey(agent.Id, serverRandomNumber, requestModel.RandomNumber);
+                agent = _agentRepository.UpdateSecurityToken(agent, securityToken);
+                Console.WriteLine($"created agent security token = {securityToken}");
 
-                return new CreateAgentResponseModel()
+                _agentCacheService.Write(agent);
+
+                return new RegisterAgentResponseModel()
                 {
                     Id = agent.Id,
+                    ServerNumber = serverRandomNumber,
                     IsSucceded = true
                 };
             }
 
-            return new CreateAgentResponseModel()
+            return new RegisterAgentResponseModel()
             {
                 IsSucceded = false
             };
@@ -97,7 +108,7 @@ namespace DataServer.App.Services
 
         public RemoveAgentResponseModel Remove(RemoveAgentRequestModel requestModel)
         {
-            var agent = _agentRepository.Remove(requestModel);
+            var agent = _agentRepository.Remove(requestModel.Id);
 
             if (agent != null)
             {

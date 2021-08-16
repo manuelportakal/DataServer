@@ -7,12 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataServer.App.CacheLayer
+namespace DataServer.Infrastructure.Caching
 {
-    public class CustomCacheService<T> where T : IDataCode
+    public class CustomCacheWrapper<T> where T : IDataCode
     {
         private readonly IMemoryCache _cache;
-        public CustomCacheService(IMemoryCache cache)
+        public CustomCacheWrapper(IMemoryCache cache)
         {
             _cache = cache;
         }
