@@ -24,7 +24,7 @@ namespace DataServer.Common.Services
             combinedBytes.AddRange(agentNumberBytes);
 
             var base64Data = Convert.ToBase64String(combinedBytes.ToArray());
-            var hashData = Sha1Utilities.CalculateHash(base64Data);
+            var hashData = ShaUtilities.CalculateSha1Hash(base64Data);
 
             return hashData;
         }
@@ -32,12 +32,16 @@ namespace DataServer.Common.Services
         public string CalculateSignature(WriteEntryRequestModel.Data requestModel, string agentSecurityToken)
         {
             var jsonData = System.Text.Json.JsonSerializer.Serialize(requestModel);
-            var base64Data = Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonData));
-            var combinedString = $"{base64Data}{agentSecurityToken}";
+            var messageAsBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonData));
 
-            var calculatedSignature = Sha1Utilities.CalculateHash(combinedString);
+            //var phaseOne = ShaUtilities.CalculateSha256Hash($"{agentSecurityToken}{base64Data}");
+            //Console.WriteLine($"phaseOne={phaseOne}");
+            //var phaseTwo = ShaUtilities.CalculateSha256Hash($"{agentSecurityToken}{phaseOne}");
+            //Console.WriteLine($"phaseTwo={phaseTwo}");
+            //var calculatedSignature = phaseTwo;
 
-            return calculatedSignature;
+            //return calculatedSignature;
+            return ShaUtilities.CalculateHmac256(agentSecurityToken, messageAsBase64);
         }
 
         public bool ValidateSignature(WriteEntryRequestModel.Data requestModel, string agentSecurityToken, string currentSignature)

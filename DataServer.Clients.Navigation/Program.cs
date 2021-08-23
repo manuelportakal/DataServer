@@ -13,7 +13,5 @@ namespace DataServer.Clients.Navigation
 
             Console.ReadLine();
         }
-
-
     }
 }

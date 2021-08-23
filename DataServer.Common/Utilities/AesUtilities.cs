@@ -10,7 +10,6 @@ namespace DataServer.Common.Utilities
 {
     public class AesUtilities
     {
-
         public static string EncryptString(string key, string plainText)
         {
             byte[] iv = new byte[16];

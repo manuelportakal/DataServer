@@ -15,6 +15,4 @@ namespace DataServer.Common.Models.EntryModels
             public string Value { get; set; }
         }
     }
-
-
 }

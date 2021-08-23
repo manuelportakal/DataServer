@@ -26,9 +26,7 @@ namespace DataServer.Clients.Navigation
                 Console.WriteLine($"Agent successfully registered. AgentId={response.Id} SecurityToken={response.AgentSecurityToken}");
             }
             else
-            {
                 Console.WriteLine("Agent registering failed");
-            }
         }
 
         public async Task SendData()

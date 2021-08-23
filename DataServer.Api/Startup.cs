@@ -1,4 +1,5 @@
 using DataServer.Api.Extensions;
+using DataServer.App.Services;
 using DataServer.Common.Services;
 using DataServer.Infrastructure;
 using DataServer.Infrastructure.Repositories;

@@ -9,5 +9,7 @@ namespace DataServer.Domain
 
         public Guid AgentId { get; set; }
         public Agent Agent { get; set; }
+
+        public bool IsSignatureEnabled { get; set; }
     }
 }
