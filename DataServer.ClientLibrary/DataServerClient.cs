@@ -29,14 +29,14 @@ namespace DataServer.ClientLibrary
         }
 
 
-        public async Task<RegisterResult> Register(string name, string agentCode, List<string> entryCodes)
+        public async Task<RegisterResult> Register(string name, string agentCode, List<EntryRequestModel> entries)
         {
             var agentRandomNumber = new Random(Environment.TickCount).Next(1000, 9999);
             var request = new RegisterAgentRequestModel()
             {
                 Name = name,
                 AgentCode = agentCode,
-                EntryCodes = entryCodes,
+                Entries = entries,
                 RandomNumber = agentRandomNumber
             };
 
@@ -61,7 +61,6 @@ namespace DataServer.ClientLibrary
             Console.WriteLine($"created agent security token = {agentSecurityToken}");
             return new RegisterResult()
             {
-
                 Id = responseModel.Id,
                 IsSucceded = true,
                 AgentSecurityToken = agentSecurityToken

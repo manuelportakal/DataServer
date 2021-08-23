@@ -1,5 +1,5 @@
-﻿using DataServer.Common.Models.AgentModels;
-using DataServer.Common.Services;
+﻿using DataServer.App.Services;
+using DataServer.Common.Models.AgentModels;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -33,7 +33,7 @@ namespace DataServer.Api.Controllers
         [HttpPost]
         public RegisterAgentResponseModel Create(RegisterAgentRequestModel requestModel)
         {
-            return _agentService.Create(requestModel);
+            return _agentService.Register(requestModel);
         }
 
 

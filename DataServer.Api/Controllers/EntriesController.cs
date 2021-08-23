@@ -1,5 +1,5 @@
-﻿using DataServer.Common.Models.EntryModels;
-using DataServer.Common.Services;
+﻿using DataServer.App.Services;
+using DataServer.Common.Models.EntryModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DataServer.Api.Controllers

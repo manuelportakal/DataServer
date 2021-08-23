@@ -1,4 +1,5 @@
-﻿using DataServer.Domain;
+﻿using DataServer.Common.Models.AgentModels;
+using DataServer.Domain;
 using DataServer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -42,35 +43,58 @@ namespace DataServer.Infrastructure.Repositories
             return agent;
         }
 
-        public Agent Create(string name, string agentCode, List<string> entryCodes)
+        public Agent Register(string name, string agentCode, List<EntryRequestModel> entries)
         {
+            var allEntries = _applicationDbContext.Entries
+                                                        .Include(e => e.Agent)
+                                                        .ToList();
+
+            var matchedEntries = allEntries.Where(entryOnDb => entries.Any(e => e.Code == entryOnDb.Code && agentCode != entryOnDb.Agent.Code))
+                                           .ToList();
+
+            if (matchedEntries != null && matchedEntries.Count > 0)
+            {
+                throw new Exception("One or more entries exists on db that belong to another Agent");
+            }
+
             var controlAgent = _applicationDbContext.Agents
                                                 .Include(a => a.PermittedEntries)
                                                 .FirstOrDefault(x => x.Code == agentCode);
 
             if (controlAgent != null)
             {
-                foreach (string item in entryCodes)
+                foreach (var item in entries)
                 {
+                    var controlPermittedEntries = controlAgent.PermittedEntries.FirstOrDefault(x => x.DataCode == item.Code);
                     //new entries
-                    if (!controlAgent.PermittedEntries.Any(x => x.DataCode == item))
+                    if (controlPermittedEntries == null)
                     {
                         var permittedEntry = new PermittedEntry()
                         {
                             AgentId = controlAgent.Id,
-                            DataCode = item
+                            DataCode = item.Code,
+                            IsSignatureEnabled = item.IsSignatureEnabled
                         };
                         _applicationDbContext.PermittedEntries.Add(permittedEntry);
+                    }
+                    else
+                    {
+                        controlPermittedEntries.IsSignatureEnabled = item.IsSignatureEnabled;
+                        _applicationDbContext.PermittedEntries.Update(controlPermittedEntries);
                     }
                 }
 
                 foreach (PermittedEntry item in controlAgent.PermittedEntries)
                 {
                     //old entries
-                    if (!entryCodes.Contains(item.DataCode))
+                    foreach (var entryCode in entries)
                     {
-                        _applicationDbContext.PermittedEntries.Remove(item);
+                        if (!entryCode.Code.Contains(entryCode.Code))
+                        {
+                            _applicationDbContext.PermittedEntries.Remove(item);
+                        }
                     }
+
                 }
 
                 _applicationDbContext.SaveChanges();
@@ -86,11 +110,12 @@ namespace DataServer.Infrastructure.Repositories
                     PermittedEntries = new List<PermittedEntry>()
                 };
 
-                foreach (var item in entryCodes)
+                foreach (var item in entries)
                 {
                     var permittedEntry = new PermittedEntry()
                     {
-                        DataCode = item
+                        DataCode = item.Code,
+                        IsSignatureEnabled = item.IsSignatureEnabled
                     };
                     agent.PermittedEntries.Add(permittedEntry);
                 }
@@ -132,6 +157,15 @@ namespace DataServer.Infrastructure.Repositories
             var agent = this.GetByCode(agentCode);
 
             return agent.PermittedEntries.Any(x => x.DataCode == entryCode);
+        }
+
+        public bool IsSignatureEnabled(string agentCode, string entryCode)
+        {
+            var agent = this.GetByCode(agentCode);
+
+            return agent.PermittedEntries
+                            .Where(x => x.DataCode == entryCode)
+                            .Any(x => x.IsSignatureEnabled);
         }
     }
 }

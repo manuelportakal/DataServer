@@ -1,29 +1,24 @@
 ﻿
 using DataServer.App.Data;
 using DataServer.Common.Models.AgentModels;
+using DataServer.Common.Services;
 using DataServer.Domain;
 using DataServer.Infrastructure;
 using DataServer.Infrastructure.Caching;
 using DataServer.Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 
-namespace DataServer.Common.Services
+namespace DataServer.App.Services
 {
     public class AgentService
     {
         private readonly SecurityService _securityService;
         private readonly CustomCacheWrapper<Agent> _agentCacheService;
         private readonly AgentRepository _agentRepository;
-        private readonly ApplicationDbContext _applicationDbContext;
-        public AgentService(ApplicationDbContext applicationDbContext, IMemoryCache memoryCache, AgentRepository agentRepository, SecurityService securityService)
+        public AgentService(IMemoryCache memoryCache, AgentRepository agentRepository, SecurityService securityService)
         {
-            _applicationDbContext = applicationDbContext;
             CacheData.Load(memoryCache);
             _agentCacheService = CacheData._agentCacheService;
             _agentRepository = agentRepository;
@@ -79,9 +74,9 @@ namespace DataServer.Common.Services
             };
         }
 
-        public RegisterAgentResponseModel Create(RegisterAgentRequestModel requestModel)
+        public RegisterAgentResponseModel Register(RegisterAgentRequestModel requestModel)
         {
-            var agent = _agentRepository.Create(requestModel.Name, requestModel.AgentCode, requestModel.EntryCodes);
+            var agent = _agentRepository.Register(requestModel.Name, requestModel.AgentCode, requestModel.Entries);
 
             if (agent != null)
             {

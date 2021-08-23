@@ -1,5 +1,6 @@
 ﻿using DataServer.App.Data;
 using DataServer.Common.Models.EntryModels;
+using DataServer.Common.Services;
 using DataServer.Domain;
 using DataServer.Infrastructure.Caching;
 using DataServer.Infrastructure.Repositories;
@@ -7,7 +8,7 @@ using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 
-namespace DataServer.Common.Services
+namespace DataServer.App.Services
 {
     public class EntryService
     {
@@ -72,14 +73,6 @@ namespace DataServer.Common.Services
         {
             var agent = _agentCacheService.Read(requestModel.RequestData.AgentCode);
             // Agent-Entry control
-            var result = _securityService.ValidateSignature(requestModel.RequestData, agent.SecurityToken, requestModel.RequestSignature);
-            if (!result)
-            {
-                return new WriteEntryResponseModel()
-                {
-                    IsSucceded = false
-                };
-            }
 
             if (!_agentRepository.IsPermitted(requestModel.RequestData.AgentCode, requestModel.RequestData.DataCode))
             {
@@ -87,6 +80,18 @@ namespace DataServer.Common.Services
                 {
                     IsSucceded = false
                 };
+            }
+
+            if (_agentRepository.IsSignatureEnabled(requestModel.RequestData.AgentCode, requestModel.RequestData.DataCode))
+            {
+                var result = _securityService.ValidateSignature(requestModel.RequestData, agent.SecurityToken, requestModel.RequestSignature);
+                if (!result)
+                {
+                    return new WriteEntryResponseModel()
+                    {
+                        IsSucceded = false
+                    };
+                }
             }
 
             var entry = new Entry()
