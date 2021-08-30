@@ -8,7 +8,5 @@ namespace DataServer.Common.Models.AgentModels
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string AgentCode { get; set; }
-
-        public bool IsSucceded { get; set; }
     }
 }

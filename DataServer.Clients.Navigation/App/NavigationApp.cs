@@ -27,7 +27,7 @@ namespace DataServer.Clients.Navigation
             }
             else
             {
-                Console.WriteLine("Agent registering failed");
+                Console.WriteLine($"Agent registering failed.  Reason={response.ErrorMessage}");
             }
         }
 
@@ -62,7 +62,7 @@ namespace DataServer.Clients.Navigation
                     if (writeResponse.IsSucceded)
                         Console.WriteLine($"Direction:{turnDirection} for {readResponse.Value}, total(ms)={diff.TotalMilliseconds}");
                     else
-                        Console.WriteLine("Error: Could not write data to server");
+                        Console.WriteLine($"Error: Could not write data to server.  Reason={writeResponse.ErrorMessage}");
 
                     Thread.Sleep(3000);
                 }

@@ -9,7 +9,5 @@ namespace DataServer.Common.Models.EntryModels
         public string Value { get; set; }
         public string DataCode { get; set; }
         public Guid AgentId { get; set; }
-
-        public bool IsSucceded { get; set; }
     }
 }

@@ -1,9 +1,9 @@
 ﻿
 using DataServer.App.Data;
 using DataServer.Common.Models.AgentModels;
+using DataServer.Common.ResponseObjects;
 using DataServer.Common.Services;
 using DataServer.Domain;
-using DataServer.Infrastructure;
 using DataServer.Infrastructure.Caching;
 using DataServer.Infrastructure.Repositories;
 using Microsoft.Extensions.Caching.Memory;
@@ -25,32 +25,32 @@ namespace DataServer.App.Services
             _securityService = securityService;
         }
 
-        public List<Agent> All()
+        public CustomResponse<List<Agent>> All()
         {
-            return _agentRepository.All();
+            var data = _agentRepository.All();
+
+            return CustomResponses.Ok(data);
         }
 
-        public ReadAgentResponseModel GetById(Guid id)
+        public CustomResponse<ReadAgentResponseModel> GetById(Guid id)
         {
             var agent = _agentRepository.GetById(id);
             if (agent != null)
             {
-                return new ReadAgentResponseModel()
+                var responseModel = new ReadAgentResponseModel()
                 {
                     Id = agent.Id,
                     AgentCode = agent.Code,
                     Name = agent.Name,
-                    IsSucceded = true
                 };
+
+                return CustomResponses.Ok(responseModel);
             }
 
-            return new ReadAgentResponseModel()
-            {
-                IsSucceded = false
-            };
+            return CustomResponses.ServerError<ReadAgentResponseModel>($"No data found for: {id}");
         }
 
-        public ReadAgentResponseModel GetByCode(string code)
+        public CustomResponse<ReadAgentResponseModel> GetByCode(string code)
         {
             var agent = _agentCacheService.Read(code);
 
@@ -59,22 +59,20 @@ namespace DataServer.App.Services
                 agent = _agentRepository.GetByCode(code);
                 _agentCacheService.Write(agent);
 
-                return new ReadAgentResponseModel()
-                {
-                    IsSucceded = false
-                };
+                return CustomResponses.ServerError<ReadAgentResponseModel>($"No data found for: {code}");
             }
 
-            return new ReadAgentResponseModel()
+            var responseModel = new ReadAgentResponseModel()
             {
                 Id = agent.Id,
                 AgentCode = agent.Code,
                 Name = agent.Name,
-                IsSucceded = true
             };
+
+            return CustomResponses.Ok(responseModel);
         }
 
-        public RegisterAgentResponseModel Register(RegisterAgentRequestModel requestModel)
+        public CustomResponse<RegisterAgentResponseModel> Register(RegisterAgentRequestModel requestModel)
         {
             var agent = _agentRepository.Register(requestModel.Name, requestModel.AgentCode, requestModel.Entries);
 
@@ -87,37 +85,33 @@ namespace DataServer.App.Services
 
                 _agentCacheService.Write(agent);
 
-                return new RegisterAgentResponseModel()
+                var responseModel = new RegisterAgentResponseModel()
                 {
                     Id = agent.Id,
                     ServerNumber = serverRandomNumber,
-                    IsSucceded = true
                 };
+
+                return CustomResponses.Ok(responseModel);
             }
 
-            return new RegisterAgentResponseModel()
-            {
-                IsSucceded = false
-            };
+            return CustomResponses.ServerError<RegisterAgentResponseModel>($"Could not be created!");
         }
 
-        public RemoveAgentResponseModel Remove(RemoveAgentRequestModel requestModel)
+        public CustomResponse<RemoveAgentResponseModel> Remove(RemoveAgentRequestModel requestModel)
         {
             var agent = _agentRepository.Remove(requestModel.Id);
 
             if (agent != null)
             {
-                return new RemoveAgentResponseModel()
+                var responseModel = new RemoveAgentResponseModel()
                 {
-                    Id = agent.Id,
-                    IsSucceded = true
+                    Id = agent.Id
                 };
+
+                return CustomResponses.Ok(responseModel);
             }
 
-            return new RemoveAgentResponseModel()
-            {
-                IsSucceded = false
-            };
+            return CustomResponses.ServerError<RemoveAgentResponseModel>($"There is no such agent: {requestModel.Id}");
         }
 
         public bool IsPermitted(string agentCode, string entryCode)

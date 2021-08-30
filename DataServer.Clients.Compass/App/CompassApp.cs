@@ -26,7 +26,7 @@ namespace DataServer.Clients.Navigation
                 Console.WriteLine($"Agent successfully registered. AgentId={response.Id} SecurityToken={response.AgentSecurityToken}");
             }
             else
-                Console.WriteLine("Agent registering failed");
+                Console.WriteLine($"Agent registering failed. Reason={response.ErrorMessage}");
         }
 
         public async Task SendData()
@@ -52,7 +52,7 @@ namespace DataServer.Clients.Navigation
                     if (response.IsSucceded)
                         Console.WriteLine($"New Value: {value}, IsSucceeded = {response.IsSucceded}, total(ms): {diff.TotalMilliseconds}");
                     else
-                        Console.WriteLine("Error: Could not write data to server");
+                        Console.WriteLine($"Error: Could not write data to server. Reason={response.ErrorMessage}");
 
                     Thread.Sleep(1000);
                 }

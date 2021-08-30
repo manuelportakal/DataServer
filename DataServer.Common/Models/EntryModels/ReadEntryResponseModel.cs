@@ -8,7 +8,5 @@ namespace DataServer.Common.Models.EntryModels
         public DateTime TimeStamp { get; set; }
         public string Value { get; set; }
         public string DataCode { get; set; }
-
-        public bool IsSucceded { get; set; }
     }
 }
