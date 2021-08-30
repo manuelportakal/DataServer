@@ -1,5 +1,6 @@
 ﻿using DataServer.App.Data;
 using DataServer.Common.Models.EntryModels;
+using DataServer.Common.ResponseObjects;
 using DataServer.Common.Services;
 using DataServer.Domain;
 using DataServer.Infrastructure.Caching;
@@ -36,12 +37,14 @@ namespace DataServer.App.Services
             }
         }
 
-        public List<Entry> All()
+        public CustomResponse<List<Entry>> All()
         {
-            return _entryRepository.All();
+            var data = _entryRepository.All();
+
+            return CustomResponses.Ok(data);
         }
 
-        public ReadEntryResponseModel GetByDataCode(ReadEntryRequestModel requestModel)
+        public CustomResponse<ReadEntryResponseModel> GetByDataCode(ReadEntryRequestModel requestModel)
         {
             var entry = _entryCacheService.Read(requestModel.DataCode);
 
@@ -51,35 +54,34 @@ namespace DataServer.App.Services
                 _entryCacheService.Write(entry);
                 Console.WriteLine($"{requestModel.DataCode}: miss");
 
-                return new ReadEntryResponseModel()
-                {
-                    IsSucceded = false
-                };
+                return CustomResponses.ServerError<ReadEntryResponseModel>($"No data found for: {requestModel.DataCode}");
             }
 
             Console.WriteLine($"{requestModel.DataCode}: hit");
 
-            return new ReadEntryResponseModel()
+            var responseModel = new ReadEntryResponseModel()
             {
                 Id = entry.Id,
                 DataCode = entry.Code,
                 Value = entry.Value,
                 TimeStamp = entry.TimeStamp,
-                IsSucceded = true
             };
+
+            return CustomResponses.Ok(responseModel);
         }
 
-        public WriteEntryResponseModel Write(WriteEntryRequestModel requestModel)
+        public CustomResponse<WriteEntryResponseModel> Write(WriteEntryRequestModel requestModel)
         {
             var agent = _agentCacheService.Read(requestModel.RequestData.AgentCode);
-            // Agent-Entry control
+
+            if (agent == null)
+            {
+                return CustomResponses.ServerError<WriteEntryResponseModel>($"There is no such agent: {requestModel.RequestData.AgentCode}");
+            }
 
             if (!_agentRepository.IsPermitted(requestModel.RequestData.AgentCode, requestModel.RequestData.DataCode))
             {
-                return new WriteEntryResponseModel()
-                {
-                    IsSucceded = false
-                };
+                return CustomResponses.Unauthorized<WriteEntryResponseModel>($"Could not create because it does not have write permissions!");
             }
 
             if (_agentRepository.IsSignatureEnabled(requestModel.RequestData.AgentCode, requestModel.RequestData.DataCode))
@@ -87,10 +89,7 @@ namespace DataServer.App.Services
                 var result = _securityService.ValidateSignature(requestModel.RequestData, agent.SecurityToken, requestModel.RequestSignature);
                 if (!result)
                 {
-                    return new WriteEntryResponseModel()
-                    {
-                        IsSucceded = false
-                    };
+                    return CustomResponses.Unauthorized<WriteEntryResponseModel>($"Could not be created because the signature could not be verified!");
                 }
             }
 
@@ -107,39 +106,38 @@ namespace DataServer.App.Services
             entry = _entryRepository.Create(entry);
             if (entry != null)
             {
-                return new WriteEntryResponseModel()
+
+                var responseModel = new WriteEntryResponseModel()
                 {
                     Id = entry.Id,
                     AgentId = requestModel.RequestData.AgentId,
                     Value = entry.Value,
                     DataCode = entry.Code,
-                    TimeStamp = entry.TimeStamp,
-                    IsSucceded = true
+                    TimeStamp = entry.TimeStamp
                 };
+
+                return CustomResponses.Ok(responseModel);
             }
-            return new WriteEntryResponseModel()
-            {
-                IsSucceded = false
-            };
+
+            return CustomResponses.ServerError<WriteEntryResponseModel>($"Entry could not be created!");
         }
 
-        public RemoveEntryResponseModel Remove(RemoveEntryRequestModel requestModel)
+        public CustomResponse<RemoveEntryResponseModel> Remove(RemoveEntryRequestModel requestModel)
         {
             var entry = _entryRepository.Remove(requestModel.Id);
 
             if (entry != null)
             {
-                return new RemoveEntryResponseModel()
+
+                var responseModel = new RemoveEntryResponseModel()
                 {
-                    Id = entry.Id,
-                    IsSucceded = true
+                    Id = entry.Id
                 };
+
+                return CustomResponses.Ok(responseModel);
             }
 
-            return new RemoveEntryResponseModel()
-            {
-                IsSucceded = false
-            };
+            return CustomResponses.ServerError<RemoveEntryResponseModel>($"There is no such entry: {requestModel.Id}");
         }
     }
 }

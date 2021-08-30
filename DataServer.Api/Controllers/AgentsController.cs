@@ -1,7 +1,10 @@
-﻿using DataServer.App.Services;
+﻿using DataServer.Api.Utilities;
+using DataServer.App.Services;
 using DataServer.Common.Models.AgentModels;
+using DataServer.Domain;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 
 namespace DataServer.Api.Controllers
 {
@@ -17,30 +20,30 @@ namespace DataServer.Api.Controllers
 
 
         [HttpGet("{id}")]
-        public IActionResult Get(Guid id)
+        public ActionResult<ReadAgentResponseModel> Get(Guid id)
         {
-            return Ok(_agentService.GetById(id));
+            return ResponseMapper.Map(_agentService.GetById(id));
         }
 
 
         [HttpGet]
-        public IActionResult All()
+        public ActionResult<List<Agent>> All()
         {
-            return Ok(_agentService.All());
+            return ResponseMapper.Map(_agentService.All());
         }
 
 
         [HttpPost]
-        public RegisterAgentResponseModel Create(RegisterAgentRequestModel requestModel)
+        public ActionResult<RegisterAgentResponseModel> Create(RegisterAgentRequestModel requestModel)
         {
-            return _agentService.Register(requestModel);
+            return ResponseMapper.Map(_agentService.Register(requestModel));
         }
 
 
         [HttpDelete]
-        public RemoveAgentResponseModel Remove(RemoveAgentRequestModel requestModel)
+        public ActionResult<RemoveAgentResponseModel> Remove(RemoveAgentRequestModel requestModel)
         {
-            return _agentService.Remove(requestModel);
+            return ResponseMapper.Map(_agentService.Remove(requestModel));
         }
     }
 }

@@ -1,6 +1,9 @@
-﻿using DataServer.App.Services;
+﻿using DataServer.Api.Utilities;
+using DataServer.App.Services;
 using DataServer.Common.Models.EntryModels;
+using DataServer.Domain;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace DataServer.Api.Controllers
 {
@@ -16,30 +19,30 @@ namespace DataServer.Api.Controllers
 
 
         [HttpPost("[action]")]
-        public ReadEntryResponseModel Read(ReadEntryRequestModel requestModel)
+        public ActionResult<ReadEntryResponseModel> Read(ReadEntryRequestModel requestModel)
         {
-            return _entryService.GetByDataCode(requestModel);
+            return ResponseMapper.Map(_entryService.GetByDataCode(requestModel));
         }
 
 
         [HttpGet]
-        public IActionResult All()
+        public ActionResult<List<Entry>> All()
         {
-            return Ok(_entryService.All());
+            return ResponseMapper.Map(_entryService.All());
         }
 
 
         [HttpPost("[action]")]
-        public WriteEntryResponseModel Write(WriteEntryRequestModel request)
+        public ActionResult<WriteEntryResponseModel> Write(WriteEntryRequestModel request)
         {
-            return _entryService.Write(request);
+            return ResponseMapper.Map(_entryService.Write(request));
         }
 
 
         [HttpDelete]
-        public RemoveEntryResponseModel Remove(RemoveEntryRequestModel requestModel)
+        public ActionResult<RemoveEntryResponseModel> Remove(RemoveEntryRequestModel requestModel)
         {
-            return _entryService.Remove(requestModel);
+            return ResponseMapper.Map(_entryService.Remove(requestModel));
         }
     }
 }
