@@ -1,5 +1,6 @@
 ﻿using DataServer.Api.Utilities;
 using DataServer.App.Services;
+using DataServer.Common.Exceptions;
 using DataServer.Common.Models.AgentModels;
 using DataServer.Domain;
 using Microsoft.AspNetCore.Mvc;

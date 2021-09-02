@@ -1,5 +1,6 @@
 ﻿
 using DataServer.App.Data;
+using DataServer.Common.Exceptions;
 using DataServer.Common.Models.AgentModels;
 using DataServer.Common.ResponseObjects;
 using DataServer.Common.Services;
@@ -47,7 +48,7 @@ namespace DataServer.App.Services
                 return CustomResponses.Ok(responseModel);
             }
 
-            return CustomResponses.ServerError<ReadAgentResponseModel>($"No data found for: {id}");
+            throw new InternalException($"No data found for: {id}");
         }
 
         public CustomResponse<ReadAgentResponseModel> GetByCode(string code)
@@ -59,7 +60,7 @@ namespace DataServer.App.Services
                 agent = _agentRepository.GetByCode(code);
                 _agentCacheService.Write(agent);
 
-                return CustomResponses.ServerError<ReadAgentResponseModel>($"No data found for: {code}");
+                throw new InternalException($"No data found for: {code}");
             }
 
             var responseModel = new ReadAgentResponseModel()
@@ -94,7 +95,7 @@ namespace DataServer.App.Services
                 return CustomResponses.Ok(responseModel);
             }
 
-            return CustomResponses.ServerError<RegisterAgentResponseModel>($"Could not be created!");
+            throw new InternalException($"Could not be created!");
         }
 
         public CustomResponse<RemoveAgentResponseModel> Remove(RemoveAgentRequestModel requestModel)
@@ -111,7 +112,7 @@ namespace DataServer.App.Services
                 return CustomResponses.Ok(responseModel);
             }
 
-            return CustomResponses.ServerError<RemoveAgentResponseModel>($"There is no such agent: {requestModel.Id}");
+            throw new InternalException($"There is no such agent: {requestModel.Id}");
         }
 
         public bool IsPermitted(string agentCode, string entryCode)

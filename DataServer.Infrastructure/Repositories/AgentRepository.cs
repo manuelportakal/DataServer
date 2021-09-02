@@ -1,4 +1,5 @@
-﻿using DataServer.Common.Models.AgentModels;
+﻿using DataServer.Common.Exceptions;
+using DataServer.Common.Models.AgentModels;
 using DataServer.Domain;
 using DataServer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -54,7 +55,7 @@ namespace DataServer.Infrastructure.Repositories
 
             if (matchedEntries != null && matchedEntries.Count > 0)
             {
-                throw new Exception("One or more entries exists on db that belong to another Agent");
+                throw new UnAuthorizedException("One or more entries exists on db that belong to another Agent");
             }
 
             var controlAgent = _applicationDbContext.Agents

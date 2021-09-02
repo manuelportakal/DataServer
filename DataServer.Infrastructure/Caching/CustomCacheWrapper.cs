@@ -19,6 +19,7 @@ namespace DataServer.Infrastructure.Caching
 
         public T Read(string dataCode)
         {
+
             var cacheKey = $"{dataCode}";
 
             _cache.TryGetValue(cacheKey, out T entry);

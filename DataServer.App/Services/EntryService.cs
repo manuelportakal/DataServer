@@ -1,4 +1,5 @@
 ﻿using DataServer.App.Data;
+using DataServer.Common.Exceptions;
 using DataServer.Common.Models.EntryModels;
 using DataServer.Common.ResponseObjects;
 using DataServer.Common.Services;
@@ -54,7 +55,7 @@ namespace DataServer.App.Services
                 _entryCacheService.Write(entry);
                 Console.WriteLine($"{requestModel.DataCode}: miss");
 
-                return CustomResponses.ServerError<ReadEntryResponseModel>($"No data found for: {requestModel.DataCode}");
+                throw new InternalException($"No data found for: {requestModel.DataCode}");
             }
 
             Console.WriteLine($"{requestModel.DataCode}: hit");
@@ -76,12 +77,12 @@ namespace DataServer.App.Services
 
             if (agent == null)
             {
-                return CustomResponses.ServerError<WriteEntryResponseModel>($"There is no such agent: {requestModel.RequestData.AgentCode}");
+                throw new InternalException($"There is no such agent: {requestModel.RequestData.AgentCode}");
             }
 
             if (!_agentRepository.IsPermitted(requestModel.RequestData.AgentCode, requestModel.RequestData.DataCode))
             {
-                return CustomResponses.Unauthorized<WriteEntryResponseModel>($"Could not create because it does not have write permissions!");
+                throw new UnAuthorizedException($"Could not create because it does not have write permissions!");
             }
 
             if (_agentRepository.IsSignatureEnabled(requestModel.RequestData.AgentCode, requestModel.RequestData.DataCode))
@@ -89,7 +90,7 @@ namespace DataServer.App.Services
                 var result = _securityService.ValidateSignature(requestModel.RequestData, agent.SecurityToken, requestModel.RequestSignature);
                 if (!result)
                 {
-                    return CustomResponses.Unauthorized<WriteEntryResponseModel>($"Could not be created because the signature could not be verified!");
+                    throw new UnAuthorizedException($"Could not be created because the signature could not be verified!");
                 }
             }
 
@@ -119,7 +120,7 @@ namespace DataServer.App.Services
                 return CustomResponses.Ok(responseModel);
             }
 
-            return CustomResponses.ServerError<WriteEntryResponseModel>($"Entry could not be created!");
+            throw new InternalException($"Entry could not be created!");
         }
 
         public CustomResponse<RemoveEntryResponseModel> Remove(RemoveEntryRequestModel requestModel)
@@ -137,7 +138,7 @@ namespace DataServer.App.Services
                 return CustomResponses.Ok(responseModel);
             }
 
-            return CustomResponses.ServerError<RemoveEntryResponseModel>($"There is no such entry: {requestModel.Id}");
+            throw new InternalException($"There is no such entry: {requestModel.Id}");
         }
     }
 }
